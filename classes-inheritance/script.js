@@ -70,7 +70,7 @@ StringBuilder.prototype = Object.create(Builder.prototype);
 
 // cut last n chars from stored string
 StringBuilder.prototype.minus = function(n) {
-    this.value = this.value.slice(0, n);
+    this.value = this.value.slice(0, this.value.length - n);
     return this;
 }
 
@@ -83,15 +83,19 @@ StringBuilder.prototype.multiply = function(int) {
 // leaves first k chars of stored string, where k = Math.floor(str.length / n)
 StringBuilder.prototype.divide = function(n) {
     const k = Math.floor(this.value.length / n);
-    this.minus(k);
+    this.value = this.value.slice(0, k);
     return this;
 }
 
 //remove taken string str from stored; Prohibited to use String.prototype.replace()
 StringBuilder.prototype.remove = function(str) {
-    const start = this.value.indexOf(str);
-    const end = start + str.length;
-    this.value = this.value.slice(0, start) + this.value.slice(end);
+    let index = this.value.indexOf(str);
+    while(index >= 0) {
+        const start = this.value.indexOf(str);
+        const end = start + str.length;
+        this.value = this.value.slice(0, start) + this.value.slice(end);
+        index = this.value.indexOf(str);
+    }
     return this;
 }
 
@@ -101,18 +105,47 @@ StringBuilder.prototype.sub = function(from, n) {
     return this;
 }
 
-// *** TESTS ***
+// *********************************
+// ************* TESTS *************
+// *********************************
+
+class IntBuilderLogger extends IntBuilder {
+    constructor(value) {
+        super(value);
+        setFunctions.call(this);
+    }
+}
+
+class StringBuilderLogger extends StringBuilder {
+    constructor(value) {
+        super(value);
+        setFunctions.call(this);
+    }
+}
+
+function setFunctions() {
+    console.log('init: ' + this.value);
+    let funcs = Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__)).filter(val => val != 'constructor');
+    funcs.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__.__proto__)).filter(val => val != 'constructor'));
+    for(let func of funcs) {
+        this[func] = function(...values) {
+            const result = Object.getPrototypeOf(this)[func].apply(this, values);
+            console.log(func+ '(' + values + ') -> ', this.value);
+            return result;
+        }
+    }
+}
 
 // IntBuilder tests
 
-let intBuilder = new IntBuilder(10);    // 10;
+let intBuilder = new IntBuilderLogger(10); // 10;
 intBuilder
     .plus(2, 3, 2)                      // 17;
     .minus(1, 2)                        // 14;
     .multiply(2)                        // 28;
     .divide(4)                          // 7;
     .mod(3)                             // 1;
-console.log(intBuilder.get());          // -> 1
+    .get();                             // -> 1
 
 intBuilder
     .set(13)                            // 13
@@ -122,22 +155,42 @@ intBuilder
     .plus(1, 6)                         // -13
     .divide(3)                          // -4
     .divide(-3)                         // 1
-console.log(intBuilder.get());          // -> 1
+    .get();                             // -> 1
 
-intBuilder = new IntBuilder();          // 0
+intBuilder = new IntBuilderLogger();    // 0
 intBuilder
     .plus(5, 5)                         // 10
     .divide(0)                          // Infinity
-console.log(intBuilder.get());          // -> Infinity
+    .get();                             // -> Infinity
 
-intBuilder = new IntBuilder(5);         // 5
+intBuilder = new IntBuilderLogger(5);   // 5
 intBuilder
     .plus()                             // 5
     .multiply()                         // NaN
-console.log(intBuilder.get());          // -> NaN
+    .get();                             // -> NaN
 
 for(let i = 0; i < 10; i++) {
     console.log(IntBuilder.random(4, 10));
 }
 
 // StringBuilder tests
+
+let strBuilder = new StringBuilderLogger('Hello'); // 'Hello';
+strBuilder
+    .plus(' all', '!')                         // 'Hello all!'
+    .minus(4)                                  // 'Hello '
+    .multiply(3)                               // 'Hello Hello Hello '
+    .divide(4)                                 // 'Hell';
+    .remove('l')                               // 'He';
+    .sub(1,1)                                  // 'e';
+    .get();                                    // -> 'e';
+
+strBuilder = new StringBuilderLogger(); // ''
+strBuilder
+    .plus('The brown', ' ', 'fox jumgs') // 'The brown fox jumgs'
+    .remove('dog')                       // 'The brown  jumgs'
+    .minus(4)                            // 'The brown  j'
+    .sub(4, 5)                           // 'brown'
+    .multiply(3)                         // 'brownbrownbrown'
+    .divide(3)                           // 'brown'
+    .get();                              // -> 'brown'
