@@ -1,34 +1,39 @@
 // *** BASIC CLASS Builder ***
 
-function Builder(value) {
-    this.value = value;
+class Builder {
+    constructor(value) {
+        this.value = value;
+    }
+
+    // take infinite number of integers and sum all with stored value / takes infinite number of strings and concat with stored string
+    plus(...n) {
+        n.forEach(arg => this.value += arg);
+        return this;
+    }
+
+    // returns stored value
+    get() {
+        return this.value;
+    }
+
+    // sets new value
+    set(value) {
+        this.value = value || 0;
+        return this;
+    }
+
+    // empty common functions to be implemented in derived classes 
+    minus() {
+    }
+
+    multiply() {
+    }
+
+    divide() {
+    }
 }
 
-// take infinite number of integers and sum all with stored value / takes infinite number of strings and concat with stored string
-Builder.prototype.plus = function(...n) {
-    n.forEach(arg => this.value += arg);
-    return this;
-}
 
-// returns stored value
-Builder.prototype.get = function() {
-    return this.value;
-}
-
-// sets new value
-Builder.prototype.set = function(value) {
-    this.value = value || 0;
-    return this;
-}
-
-Builder.prototype.minus = function() {
-}
-
-Builder.prototype.multiply = function() {
-}
-
-Builder.prototype.divide = function() {
-}
 
 // *** DERIVED ES6 CLASS IntBuilder ***
 
@@ -72,7 +77,7 @@ class IntBuilder extends Builder {
 // *** DERIVED ES5 CLASS StringBuilder ***
 
 function StringBuilder(value) {
-    Builder.call(this, value || '');
+    Object.assign(this, new Builder(value || ''));
 }
 
 StringBuilder.prototype = Object.create(Builder.prototype);
