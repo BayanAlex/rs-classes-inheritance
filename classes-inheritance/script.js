@@ -121,7 +121,12 @@ StringBuilder.prototype.sub = function(from, n) {
 class IntBuilderLogger extends IntBuilder {
     constructor(value) {
         super(value);
-        setFunctions.call(this);
+        setFunctions.call(this);        
+    }
+    static random(...values) {
+        const result = IntBuilder.random.apply(this, values);
+        console.log('random(' + values + ')');
+        return result;
     }
 }
 
@@ -180,7 +185,7 @@ intBuilder
     .get();                             // -> NaN
 
 for(let i = 0; i < 10; i++) {
-    console.log(IntBuilder.random(4, 10));
+    console.log(IntBuilderLogger.random(4, 10));
 }
 
 // StringBuilder tests
