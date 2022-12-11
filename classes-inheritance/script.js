@@ -202,8 +202,8 @@ strBuilder
 
 strBuilder = new StringBuilderLogger(); // ''
 strBuilder
-    .plus('The brown', ' ', 'fox jumgs') // 'The brown fox jumgs'
-    .remove('dog')                       // 'The brown  jumgs'
+    .plus('The brown', ' ', 'fox jumps') // 'The brown fox jumps'
+    .remove('fox')                       // 'The brown  jumps'
     .minus(4)                            // 'The brown  j'
     .sub(4, 5)                           // 'brown'
     .multiply(3)                         // 'brownbrownbrown'
