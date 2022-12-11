@@ -21,6 +21,15 @@ Builder.prototype.set = function(value) {
     return this;
 }
 
+Builder.prototype.minus = function() {
+}
+
+Builder.prototype.multiply = function() {
+}
+
+Builder.prototype.divide = function() {
+}
+
 // *** DERIVED ES6 CLASS IntBuilder ***
 
 class IntBuilder extends Builder {
@@ -125,8 +134,9 @@ class StringBuilderLogger extends StringBuilder {
 
 function setFunctions() {
     console.log('init: ' + this.value);
-    let funcs = Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__)).filter(val => val != 'constructor');
-    funcs.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__.__proto__)).filter(val => val != 'constructor'));
+    let funcs = Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__));
+    funcs.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__.__proto__)));
+    funcs = funcs.filter(val => val != 'constructor').filter((val, i, a) => a.indexOf(val, i + 1) == -1);
     for(let func of funcs) {
         this[func] = function(...values) {
             const result = Object.getPrototypeOf(this)[func].apply(this, values);
