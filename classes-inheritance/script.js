@@ -21,19 +21,7 @@ class Builder {
         this.value = value || 0;
         return this;
     }
-
-    // empty common functions to be implemented in derived classes 
-    minus() {
-    }
-
-    multiply() {
-    }
-
-    divide() {
-    }
 }
-
-
 
 // *** DERIVED ES6 CLASS IntBuilder ***
 
@@ -77,7 +65,7 @@ class IntBuilder extends Builder {
 // *** DERIVED ES5 CLASS StringBuilder ***
 
 function StringBuilder(value) {
-    Object.assign(this, new Builder(value || ''));
+    this.value = value || '';
 }
 
 StringBuilder.prototype = Object.create(Builder.prototype);
@@ -118,99 +106,3 @@ StringBuilder.prototype.sub = function(from, n) {
     this.value = this.value.slice(from, from + n);
     return this;
 }
-
-// *********************************
-// ************* TESTS *************
-// *********************************
-
-class IntBuilderLogger extends IntBuilder {
-    constructor(value) {
-        super(value);
-        setFunctions.call(this);        
-    }
-    static random(...values) {
-        const result = IntBuilder.random.apply(this, values);
-        console.log('random(' + values + ')');
-        return result;
-    }
-}
-
-class StringBuilderLogger extends StringBuilder {
-    constructor(value) {
-        super(value);
-        setFunctions.call(this);
-    }
-}
-
-function setFunctions() {
-    console.log('init: ' + this.value);
-    let funcs = Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__));
-    funcs.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(this.__proto__.__proto__)));
-    funcs = funcs.filter(val => val != 'constructor').filter((val, i, a) => a.indexOf(val, i + 1) == -1);
-    for(let func of funcs) {
-        this[func] = function(...values) {
-            const result = Object.getPrototypeOf(this)[func].apply(this, values);
-            console.log(func+ '(' + values + ') -> ', this.value);
-            return result;
-        }
-    }
-}
-
-// IntBuilder tests
-
-let intBuilder = new IntBuilderLogger(10); // 10;
-intBuilder
-    .plus(2, 3, 2)                      // 17;
-    .minus(1, 2)                        // 14;
-    .multiply(2)                        // 28;
-    .divide(4)                          // 7;
-    .mod(3)                             // 1;
-    .get();                             // -> 1
-
-intBuilder
-    .set(13)                            // 13
-    .mod(5)                             // 3
-    .multiply(-4)                       // -12
-    .minus(8)                           // -20
-    .plus(1, 6)                         // -13
-    .divide(3)                          // -4
-    .divide(-3)                         // 1
-    .get();                             // -> 1
-
-intBuilder = new IntBuilderLogger();    // 0
-intBuilder
-    .plus(5, 5)                         // 10
-    .divide(0)                          // Infinity
-    .get();                             // -> Infinity
-
-intBuilder = new IntBuilderLogger(5);   // 5
-intBuilder
-    .plus()                             // 5
-    .multiply()                         // NaN
-    .get();                             // -> NaN
-
-for(let i = 0; i < 10; i++) {
-    console.log(IntBuilderLogger.random(4, 10));
-}
-
-// StringBuilder tests
-
-let strBuilder = new StringBuilderLogger('Hello'); // 'Hello';
-strBuilder
-    .plus(' all', '!')                         // 'Hello all!'
-    .minus(4)                                  // 'Hello '
-    .multiply(3)                               // 'Hello Hello Hello '
-    .divide(4)                                 // 'Hell';
-    .remove('l')                               // 'He';
-    .sub(1,1)                                  // 'e';
-    .get();                                    // -> 'e';
-
-strBuilder = new StringBuilderLogger(); // ''
-strBuilder
-    .plus('The brown', ' ', 'fox jumps') // 'The brown fox jumps'
-    .remove('fox')                       // 'The brown  jumps'
-    .minus(4)                            // 'The brown  j'
-    .sub(4, 5)                           // 'brown'
-    .multiply(3)                         // 'brownbrownbrown'
-    .divide(3)                           // 'brown'
-    .get();                              // -> 'brown'
