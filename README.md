@@ -1,2 +1,7 @@
-# bayanalex-JSFEEN2022Q3
-Private repository for @bayanalex
+# Classes and inheritance (RS School)
+[👉 Task](https://github.com/rolling-scopes-school/js-fe-course-en/blob/main/tasks/classes-inheritance/classes-inheritance.md)  
+##### Description:  
+- ES5 and ES6 classes inheritance
+- Functions chaining
+  
+`JavaScript`
